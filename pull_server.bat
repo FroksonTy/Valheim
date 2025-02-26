@@ -4,7 +4,7 @@ setlocal
 :: НАСТРОЙТЕ ЭТИ ПУТИ ПОД СЕБЯ
 set GIT_REPO="https://github.com/FroksonTy/Valheim.git"
 set GIT_CLONE_PARENT="E:\git"
-set SERVER_FOLDER="%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds"
+set SERVER_FOLDER="%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds_local"
  
 :: Удаляем старую временную папку (если есть)
 rmdir /s /q %GIT_CLONE_PARENT%\valheim-server 2>nul

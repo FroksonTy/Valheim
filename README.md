@@ -22,6 +22,7 @@
 2. Закончив сессию, необходимо запустить файл **push_server.bat**, указать комментарий (политика git), например, - дату сессии. В данном случае файлы мира отправятся на удалённый репозиторий.<br>
     2.1. В первый раз гит предложит авторизоваться в git (авторизуемся через браузер)<br>
     2.2 Если в процессе push'а возникает ошибка "fatal: unable to auto-detect email address.." - открываем git bash и прописываем **git config --global user.email "you@example.com"**, где почта в ковычках - Ваша почта GitHub.
+* Если в процессе push'а/pull'а возникает ошибка "schannel: failed to receive handshake, SSL/TLS connection failed" - открываем .gitconfig и вместо строчки **sslBackend = schannel** пишем **sslbackend = openssl**.
 
 **ОБЯЗАТЕЛЬНАЯ К ПРОЧТЕНИЮ ИНФОРМАЦИЯ:**
 pull_server.bat работает по принципу загрузки, push_server.bat - сохранения. <br>

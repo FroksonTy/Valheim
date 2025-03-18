@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 
 :: НАСТРОЙТЕ ЭТИ ПУТИ ПОД СЕБЯ
 set GIT_REPO="https://github.com/FroksonTy/Valheim.git"
@@ -32,26 +32,38 @@ echo - - - - - - - - - - - - - - - - - - - - -
 echo Backups creating started. Don't close this window while playing Valheim.
 
 :: Настройки бэкапов
-set BACKUP_DIR="%USERPROFILE%\Desktop\Valheim_Backups"
+set "BACKUP_ROOT=%USERPROFILE%\Desktop\Valheim_Backups"
 set INTERVAL=600
+set MAX_BACKUPS=5
+
+:: Создаем корневую папку для бэкапов
+mkdir "%BACKUP_ROOT%" >nul 2>&1
 
 :backup_loop
-echo [%time%] Deleting old backups...
-rmdir /s /q %BACKUP_DIR% 2>nul
+:: Генерация временной метки
+for /f "tokens=2 delims==" %%G in ('wmic os get localdatetime /value') do set "datetime=%%G"
+set "timestamp=!datetime:~0,4!-!datetime:~4,2!-!datetime:~6,2!_!datetime:~8,2!-!datetime:~10,2!-!datetime:~12,2!"
 
-echo [%time%] Creating a new backup...
-mkdir %BACKUP_DIR% >nul 2>&1
-robocopy %SERVER_FOLDER% %BACKUP_DIR% * /E /NJH /NJS /NDL /NP
+:: Создаем папку для нового бэкапа
+set "CURRENT_BACKUP=%BACKUP_ROOT%\!timestamp!"
+mkdir "!CURRENT_BACKUP!"
 
-if %errorlevel% leq 7 (
-    echo [%time%] Backup created succsessfully in %BACKUP_DIR%
-) else (
-    echo [%time%] Error while backup creating!
+:: Копируем файлы мира
+robocopy "%SERVER_FOLDER%" "!CURRENT_BACKUP!" * /E /NJH /NJS /NDL /NP /R:3 /W:5
+
+:: Удаляем старые бэкапы (оставляем последние MAX_BACKUPS)
+set count=0
+for /f "delims=" %%i in ('dir "%BACKUP_ROOT%" /ad /b /o-d 2^>nul') do (
+    set /a count+=1
+    if !count! gtr %MAX_BACKUPS% (
+        echo [%time%] Deleting old backup: %%i
+        rmdir /s /q "%BACKUP_ROOT%\%%i"
+    )
 )
 
+echo [%time%] Backup created: !timestamp!
 echo [%time%] Next backup in %INTERVAL% seconds.
 timeout /t %INTERVAL% /nobreak >nul
 goto backup_loop
 
-::pause
 :exit
